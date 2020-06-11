@@ -82,10 +82,18 @@ async function fetchPage(url, options) {
 
   await page.evaluate(() => {
     let promises = Array.from(document.querySelectorAll('.img_loading')).map(img => {
-      return new Promise(resolve => {
-        img.src = img.dataset.src
-        img.addEventListener('load', resolve)
+      let timeout = new Promise(resolve => {
+        setTimeout(resolve, 9000)
       })
+      let load = new Promise(resolve => {
+        if (img.src == img.dataset.src) {
+          resolve()
+        } else {
+          img.src = img.dataset.src
+          img.addEventListener('load', resolve)
+        }
+      })
+      return Promise.race([timeout, load])
     })
     return Promise.all(promises)
   })
@@ -158,3 +166,4 @@ async function pushFiles(number, title, key, options) {
 }
 
 performTasks()
+
