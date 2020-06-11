@@ -1,0 +1,5 @@
+name: weixin-archive-action
+description: 'save weixin article as pdf and mht'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
