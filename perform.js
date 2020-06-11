@@ -27,7 +27,7 @@ async function performTasks() {
 
   let promises = data.map(async (issue) => {
     try {
-      let {title, key} = await fetchPage(issue.body, options)
+      let {title, key} = await fetchPage(issue.body || issue.title, options)
       await pushFiles(issue.number, title, key, options)
       await octokit.issues.createComment({
         owner: OWNER,
