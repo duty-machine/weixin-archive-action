@@ -53,7 +53,7 @@ async function fetchPage(url, opts) {
 
   let defaultOptions = {
     pdf: true,
-    mht: true
+    mht: false
   }
 
   let options = Object.assign(defaultOptions, opts)
@@ -122,6 +122,7 @@ async function pushFiles(number, title, key) {
       email: 'none@none.com'
     }
   })
+  /*
   await octokit.repos.createOrUpdateFileContents({
     owner: OWNER,
     repo: REPO,
@@ -137,6 +138,7 @@ async function pushFiles(number, title, key) {
       email: 'none@none.com'
     }
   })
+  */
 }
 
 performTasks()
