@@ -1,15 +1,19 @@
-# weixin-archive-action
+### 这是什么？
 
-将微信文章保存为pdf和mht格式的github action，抓取之后会将文件提交到github仓库。
+这是一个用于将微信文章保存为pdf和mht格式的github action。配置了此action的仓库，在新建issue的时候会触发抓取，最终文章的备份文件会被commit回仓库中。
 
-抓取样例见：https://github.com/duty-machine/weixin-archive-action-demo/issues/1
+抓取的样例可见：https://github.com/duty-machine/weixin-archive-action-demo/issues/1
 
-# 使用指南
+### 如何配置？
 
-新建一个代码仓库，可以是私有仓库，在`Actions`标签页里新建一个workflow，然后填入 https://github.com/duty-machine/weixin-archive-action/blob/master/samples/dockerhub_workflow.yml 的内容，保存。
+1. 新建一个代码仓库，这个仓库将用来存放抓取到的文件，可以是私有仓库。
+2. 在`Actions`标签页里Setup一个workflow，选择Simple workflow或者任意一个都可以。
+3. 将编辑器里的内容替换成 https://github.com/duty-machine/weixin-archive-action/blob/master/samples/dockerhub_workflow.yml 的内容，然后保存。
 
-在这个代码仓库新建一个issue，在标题或正文中写入要抓取的微信文章链接，提交之后会触发抓取，在`Actions`标签页也可以看到执行情况。
+### 如何使用？
 
-由于每个github仓库有1gb的大小限制，建议自行建立仓库使用。
+在代码仓库中新建一个issue，在标题或正文中写入要抓取的微信文章链接，提交即可触发抓取。一般需要数分钟，抓取的过程可以在`Actions`标签页下看到。
 
-samples文件夹里的有两个workflow，其中dockerhub_workflow会快一点，因为是直接从dockerhub上下载构建好的镜像，另一个则是从dockerfile开始构建。
+### samples文件夹里的两个workflow有什么不同？
+
+dockerhub_workflow会直接下载我预先推送到dockerhub上的镜像，所以可以跳过构建过程，会稍微快一点。dockerfile_workflow则是使用从Dockerfile开始构建的action。
