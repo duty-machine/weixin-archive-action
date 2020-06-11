@@ -18,4 +18,4 @@ RUN npm install
 
 COPY perform.js .
 
-ENTRYPOINT ["node", "/usr/app/perform.js"]
+ENTRYPOINT ["node", "--unhandled-rejections=strict", "/usr/app/perform.js"]

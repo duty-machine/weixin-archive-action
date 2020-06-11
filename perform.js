@@ -5,8 +5,8 @@ let { Octokit } = require("@octokit/rest")
 require('dotenv').config()
 
 let TOKEN = process.env.TOKEN
-let OWNER = process.env.OWNER
-let REPO = process.env.REPO
+let REPOSITORY = process.env.REPOSITORY
+let [OWNER, REPO] = REPOSITORY.split('/')
 
 let octokit = new Octokit({
   auth: TOKEN
@@ -26,28 +26,37 @@ async function performTasks() {
   }
 
   let promises = data.map(async (issue) => {
-    if (issue.title == 'archive') {
+    try {
       let {title, key} = await fetchPage(issue.body, options)
       await pushFiles(issue.number, title, key, options)
       await octokit.issues.createComment({
         owner: OWNER,
         repo: REPO,
         issue_number: issue.number,
-        body: `https://github.com/${OWNER}/${REPO}/tree/master/${issue.number}`
+        body: `已保存于：https://github.com/${OWNER}/${REPO}/tree/master/${issue.number}`
       })
       await octokit.issues.update({
         owner: OWNER,
         repo: REPO,
         issue_number: issue.number,
-        state: 'closed'
+        state: 'closed',
+        title: '已保存'
       })
-    } else {
+    } catch(error) {
+      await octokit.issues.createComment({
+        owner: OWNER,
+        repo: REPO,
+        issue_number: issue.number,
+        body: `错误 ${error.toString()}`
+      })
       await octokit.issues.update({
         owner: OWNER,
         repo: REPO,
         issue_number: issue.number,
-        state: 'closed'
+        state: 'closed',
+        title: '错误'
       })
+      throw error
     }
   })
 

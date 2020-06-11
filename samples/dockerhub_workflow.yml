@@ -1,0 +1,17 @@
+name: Archive
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Docker
+      uses: docker://dutymachine/weixin-archive-action:latest
+      env:
+        TOKEN: ${{ github.token }}
+        REPOSITORY: ${{ github.repository }}
