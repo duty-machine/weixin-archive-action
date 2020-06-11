@@ -19,10 +19,16 @@ async function performTasks() {
     state: 'open'
   })
 
+  let options = {
+    png: false,
+    mht: true,
+    pdf: true
+  }
+
   let promises = data.map(async (issue) => {
     if (issue.title == 'archive') {
-      let {title, key} = await fetchPage(issue.body)
-      await pushFiles(issue.number, title, key)
+      let {title, key} = await fetchPage(issue.body, options)
+      await pushFiles(issue.number, title, key, options)
       await octokit.issues.createComment({
         owner: OWNER,
         repo: REPO,
@@ -48,15 +54,8 @@ async function performTasks() {
   await Promise.all(promises)
 }
 
-async function fetchPage(url, opts) {
+async function fetchPage(url, options) {
   let key = +new Date()
-
-  let defaultOptions = {
-    pdf: true,
-    mht: false
-  }
-
-  let options = Object.assign(defaultOptions, opts)
 
   let browser = await puppeteer.launch({args: ['--no-sandbox']})
   let page = await browser.newPage()
@@ -69,7 +68,7 @@ async function fetchPage(url, opts) {
   let {height} = await page.viewport()
 
   await page.goto(url, {
-    waitUntil: 'domcontentloaded'
+    waitUntil: ['domcontentloaded', 'networkidle2']
   })
 
   await page.evaluate(() => {
@@ -82,9 +81,11 @@ async function fetchPage(url, opts) {
     return Promise.all(promises)
   })
 
+  await page.waitFor(1000)
+
   let title = await page.evaluate(() => document.querySelector('meta[property="og:title"]').content)
 
-  if (options.pdf) {
+  if (options.png) {
     await page.screenshot({
       path: `${key}.png`,
       fullPage: true
@@ -98,6 +99,14 @@ async function fetchPage(url, opts) {
     await fs.writeFile(`${key}.mht`, data)
   }
 
+  if (options.pdf) {
+    await page.pdf({
+      path: `${key}.pdf`,
+      width: '414px',
+      height: '2000px'
+    })
+  }
+
   await browser.close()
 
   return {
@@ -106,39 +115,37 @@ async function fetchPage(url, opts) {
   }
 }
 
-async function pushFiles(number, title, key) {
-  await octokit.repos.createOrUpdateFileContents({
-    owner: OWNER,
-    repo: REPO,
-    path: `${number}/${title}.png`,
-    message: 'commit',
-    content: await fs.readFile(`${key}.png`, {encoding: 'base64'}),
-    committer: {
-      name: 'none',
-      email: 'none@none.com'
-    },
-    author: {
-      name: 'none',
-      email: 'none@none.com'
-    }
-  })
-  /*
-  await octokit.repos.createOrUpdateFileContents({
-    owner: OWNER,
-    repo: REPO,
-    path: `${number}/${title}.mht`,
-    message: 'commit',
-    content: await fs.readFile(`${key}.mht`, {encoding: 'base64'}),
-    committer: {
-      name: 'none',
-      email: 'none@none.com'
-    },
-    author: {
-      name: 'none',
-      email: 'none@none.com'
-    }
-  })
-  */
+async function pushFiles(number, title, key, options) {
+  async function commitFile(type) {
+    await octokit.repos.createOrUpdateFileContents({
+      owner: OWNER,
+      repo: REPO,
+      path: `${number}/${title}.${type}`,
+      message: 'commit',
+      content: await fs.readFile(`${key}.${type}`, {encoding: 'base64'}),
+      committer: {
+        name: 'none',
+        email: 'none@none.com'
+      },
+      author: {
+        name: 'none',
+        email: 'none@none.com'
+      }
+    })
+  }
+
+  if (options.png) {
+    await commitFile('png')
+  }
+
+  if (options.mht) {
+    await commitFile('mht')
+  }
+
+  if (options.pdf) {
+    await commitFile('pdf')
+  }
+
 }
 
 performTasks()
