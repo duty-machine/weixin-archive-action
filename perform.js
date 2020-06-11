@@ -58,7 +58,7 @@ async function fetchPage(url, opts) {
 
   let options = Object.assign(defaultOptions, opts)
 
-  let browser = await puppeteer.launch()
+  let browser = await puppeteer.launch({args: ['--no-sandbox']})
   let page = await browser.newPage()
 
   await page.setViewport({
