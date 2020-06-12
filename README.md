@@ -1,6 +1,6 @@
 ### 这是什么？
 
-这是一个用于将微信文章保存为pdf和mht格式的github action。配置了此action的仓库，在新建issue的时候会触发抓取，最终文章的备份文件会被commit回仓库中。
+这是一个用于将微信文章保存为jpg和mht格式的github action。配置了此action的仓库，在新建issue的时候会触发抓取，最终文章的备份文件会被commit回仓库中。
 
 抓取的样例可见：https://github.com/duty-machine/weixin-archive-action-demo/issues/1
 
