@@ -16,6 +16,6 @@ COPY package-lock.json .
 
 RUN npm install
 
-COPY perform.js .
+COPY . .
 
 ENTRYPOINT ["node", "--unhandled-rejections=strict", "/usr/app/perform.js"]
