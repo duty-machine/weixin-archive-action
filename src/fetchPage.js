@@ -10,7 +10,7 @@ module.exports = async function fetchPage(url, options) {
   await page.setViewport({
     width: 414,
     height: 736,
-    deviceScaleFactor: 2
+    deviceScaleFactor: 3
   })
 
   await page.goto(url, {
