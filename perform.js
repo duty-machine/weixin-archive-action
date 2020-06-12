@@ -1,6 +1,7 @@
 let puppeteer = require('puppeteer')
 let fs = require('fs').promises
 let { Octokit } = require("@octokit/rest")
+let fetchPage = require('./src/fetchPage')
 
 require('dotenv').config()
 
@@ -22,7 +23,8 @@ async function performTasks() {
   let options = {
     png: false,
     mht: true,
-    pdf: true
+    pdf: false,
+    jpg: true
   }
 
   let promises = data.map(async (issue) => {
@@ -63,75 +65,6 @@ async function performTasks() {
   await Promise.all(promises)
 }
 
-async function fetchPage(url, options) {
-  let key = +new Date()
-
-  let browser = await puppeteer.launch({args: ['--no-sandbox']})
-  let page = await browser.newPage()
-
-  await page.setViewport({
-    width: 414,
-    height: 736,
-    deviceScaleFactor: 2
-  })
-  let {height} = await page.viewport()
-
-  await page.goto(url, {
-    waitUntil: ['domcontentloaded', 'networkidle2']
-  })
-
-  await page.evaluate(() => {
-    let promises = Array.from(document.querySelectorAll('.img_loading')).map(img => {
-      let timeout = new Promise(resolve => {
-        setTimeout(resolve, 9000)
-      })
-      let load = new Promise(resolve => {
-        if (img.src == img.dataset.src) {
-          resolve()
-        } else {
-          img.src = img.dataset.src
-          img.addEventListener('load', resolve)
-        }
-      })
-      return Promise.race([timeout, load])
-    })
-    return Promise.all(promises)
-  })
-
-  await page.waitFor(1000)
-
-  let title = await page.evaluate(() => document.querySelector('meta[property="og:title"]').content)
-
-  if (options.png) {
-    await page.screenshot({
-      path: `${key}.png`,
-      fullPage: true
-    })
-  }
-
-  if (options.mht) {
-    let client = await page.target().createCDPSession()
-    let { data } = await client.send('Page.captureSnapshot')
-
-    await fs.writeFile(`${key}.mht`, data)
-  }
-
-  if (options.pdf) {
-    await page.pdf({
-      path: `${key}.pdf`,
-      width: '414px',
-      height: '2000px'
-    })
-  }
-
-  await browser.close()
-
-  return {
-    title,
-    key
-  }
-}
-
 async function pushFiles(number, title, key, options) {
   async function commitFile(type) {
     await octokit.repos.createOrUpdateFileContents({
@@ -161,6 +94,10 @@ async function pushFiles(number, title, key, options) {
 
   if (options.pdf) {
     await commitFile('pdf')
+  }
+
+  if (options.jpg) {
+    await commitFile('jpg')
   }
 
 }
