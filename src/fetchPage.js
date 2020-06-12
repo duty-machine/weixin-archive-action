@@ -4,7 +4,7 @@ let fs = require('fs').promises
 module.exports = async function fetchPage(url, options) {
   let key = +new Date()
 
-  let browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-dev-shm-usage']})
+  let browser = await puppeteer.launch({executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--disable-dev-shm-usage']})
   let page = await browser.newPage()
 
   await page.setViewport({
