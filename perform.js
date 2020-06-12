@@ -70,7 +70,7 @@ async function pushFiles(number, title, key, options) {
     await octokit.repos.createOrUpdateFileContents({
       owner: OWNER,
       repo: REPO,
-      path: `${number}/${title}.${type}`,
+      path: `${number}/${title.replace(/\//g, '-')}.${type}`,
       message: 'commit',
       content: await fs.readFile(`${key}.${type}`, {encoding: 'base64'}),
       committer: {
