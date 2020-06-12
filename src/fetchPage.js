@@ -29,6 +29,7 @@ module.exports = async function fetchPage(url, options) {
           resolve()
         } else {
           img.src = img.dataset.src
+          img.classList.remove('img_loading')
           img.addEventListener('load', resolve)
         }
       })
