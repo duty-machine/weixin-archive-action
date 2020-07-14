@@ -9,7 +9,7 @@ RUN apt-get update \
       --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-COPY fonts.conf ~/.config/fontconfig/
+COPY fonts.conf /etc/fonts/local.conf
 RUN fc-cache
 
 WORKDIR /usr/app
