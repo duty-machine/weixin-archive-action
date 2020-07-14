@@ -8,7 +8,7 @@
 
 1. 新建一个代码仓库，这个仓库将用来存放抓取到的文件，可以是私有仓库。
 2. 在`Actions`标签页里Setup一个workflow，选择Simple workflow或者任意一个都可以。
-3. 将编辑器里的内容替换成 https://github.com/duty-machine/weixin-archive-action/blob/master/samples/dockerhub_workflow.yml 的内容，然后保存。
+3. 将编辑器里的内容替换成 https://github.com/duty-machine/weixin-archive-action/blob/master/samples/dockerfile_workflow.yml 的内容，然后保存。
 
 ### 如何使用？
 
